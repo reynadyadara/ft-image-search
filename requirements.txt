@@ -1,0 +1,9 @@
+fastapi
+uvicorn[standard]
+python-multipart
+aiofiles
+pillow
+rclone
+faiss-cpu
+open_clip_torch @ git+https://github.com/mlfoundations/open_clip.git
+torch
