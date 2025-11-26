@@ -66,14 +66,25 @@ PYUNZIP
   echo "rclone installed"
 fi
 
-# create temporary rclone config from env vars (Railway env vars)
+# create temporary rclone config from env vars using python to avoid quoting issues
 mkdir -p /tmp/.rclone
-cat > /tmp/.rclone/rclone.conf <<'EOF'
-[gdrive]
-type = ${RCLONE_CONFIG_GDRIVE_TYPE:-drive}
-scope = ${RCLONE_CONFIG_GDRIVE_SCOPE:-drive}
-token = ${RCLONE_CONFIG_GDRIVE_TOKEN}
-EOF
+python3 - <<'PY'
+import os, json, sys
+tok = os.environ.get("RCLONE_CONFIG_GDRIVE_TOKEN")
+if not tok:
+    print("ERROR: environment variable RCLONE_CONFIG_GDRIVE_TOKEN is empty", file=sys.stderr)
+    sys.exit(1)
+# tok is expected to be a JSON string like: {"access_token":"...","refresh_token":"...","expiry":"..."}
+# We will write the config file with token = <json>
+conf_path = "/tmp/.rclone/rclone.conf"
+with open(conf_path, "w", encoding="utf-8") as f:
+    f.write("[gdrive]\n")
+    f.write("type = " + os.environ.get("RCLONE_CONFIG_GDRIVE_TYPE", "drive") + "\n")
+    f.write("scope = " + os.environ.get("RCLONE_CONFIG_GDRIVE_SCOPE", "drive") + "\n")
+    # write token exactly as provided (no additional quoting)
+    f.write("token = " + tok + "\n")
+print("Wrote rclone config to", conf_path)
+PY
 
 export RCLONE_CONFIG=/tmp/.rclone/rclone.conf
 
