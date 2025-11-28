@@ -3,6 +3,4 @@ uvicorn[standard]
 python-multipart
 aiofiles
 pillow
-torch
-open_clip_torch @ git+https://github.com/mlfoundations/open_clip.git
-faiss-cpu
+faiss-cpu   # can include, but not strict for now
