@@ -1,6 +1,9 @@
 fastapi
-uvicorn[standard]
-python-multipart
-aiofiles
+uvicorn
 pillow
-faiss-cpu   # can include, but not strict for now
+numpy
+torch
+open_clip_torch @ git+https://github.com/mlfoundations/open_clip.git
+faiss-cpu
+aiofiles
+python-multipart
