@@ -1,14 +1,14 @@
-FROM python:3.10-slim
+FROM python:3.11-slim
 
 WORKDIR /app
-COPY requirements.txt /app/
-RUN pip install --no-cache-dir -r requirements.txt
+COPY requirements.txt .
+RUN pip install --upgrade pip
+# install system deps for pillow/faiss
+RUN apt-get update && apt-get install -y build-essential wget unzip libsndfile1 && rm -rf /var/lib/apt/lists/*
 
-# copy code
-COPY . /app
+# install pip deps (torch + open_clip + faiss-cpu may be large)
+RUN pip install -r requirements.txt
 
-# create data dir for static and index
-RUN mkdir -p /data/master_images /data
-
-EXPOSE 8080
+COPY . .
+ENV DATA_DIR=/data
 CMD ["uvicorn", "api:app", "--host", "0.0.0.0", "--port", "8080"]
